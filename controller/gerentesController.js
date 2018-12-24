@@ -1,4 +1,5 @@
 
+const crypto = require('crypto');
 const pool = require('../database/db.js');
 
 const controller = {};
@@ -6,7 +7,7 @@ const controller = {};
 controller.getAll = async (req, res) => {
   try {
     const client = await pool.connect();
-    const queryStr = 'SELECT * FROM aluno';
+    const queryStr = 'SELECT * FROM gerente';
     const result = await client.query(queryStr);
     client.release();
     const results = result.rows;
@@ -21,7 +22,7 @@ controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
     const client = await pool.connect();
-    const queryStr = 'SELECT * FROM aluno WHERE aluno_id = $1';
+    const queryStr = 'SELECT * FROM gerente WHERE gerente_id = $1';
     const result = await client.query(queryStr, [id]);
     client.release();
     const results = result.rows;
@@ -32,12 +33,21 @@ controller.getOne = async (req, res) => {
   }
 };
 
+controller.encrypt = (req, res, next) => {
+  const { senha } = req.body;
+  const hash = crypto.createHash('sha512');
+  hash.update(senha);
+  const hashHex = hash.digest('hex');
+  req.body.senha = hashHex;
+  next();
+};
+
 controller.save = async (req, res) => {
   try {
-    const { alunoId, turmaId, matricula } = req.body;
+    const { gerenteId, login, senha, superUser } = req.body;
     const client = await pool.connect();
-    const queryStr = 'INSERT INTO aluno (aluno_id, turma_id, matricula) VALUES ($1, $2, $3) RETURNING *';
-    const result = await client.query(queryStr, [alunoId, turmaId, matricula]);
+    const queryStr = 'INSERT INTO gerente (gerente_id, login, senha, superUser) VALUES ($1, $2, $3, $4) RETURNING *';
+    const result = await client.query(queryStr, [gerenteId, login, senha, superUser]);
     client.release();
     const results = result.rows[0];
     res.json(results);
