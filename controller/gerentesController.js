@@ -44,7 +44,9 @@ controller.encrypt = (req, res, next) => {
 
 controller.save = async (req, res) => {
   try {
-    const { gerenteId, login, senha, superUser } = req.body;
+    const {
+      gerenteId, login, senha, superUser,
+    } = req.body;
     const client = await pool.connect();
     const queryStr = 'INSERT INTO gerente (gerente_id, login, senha, superUser) VALUES ($1, $2, $3, $4) RETURNING *';
     const result = await client.query(queryStr, [gerenteId, login, senha, superUser]);
