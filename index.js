@@ -3,8 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const turmasRouter = require('./routers/turmas.js');
-const alunosRouter = require('./router/alunos.js');
-const pessoasRouter = require('./router/pessoas.js');
+const alunosRouter = require('./routers/alunos.js');
+const pessoasRouter = require('./routers/pessoas.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
