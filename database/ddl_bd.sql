@@ -24,6 +24,7 @@ create table aluno(
   aluno_id integer not null,
   matricula varchar(10) unique not null,
   turma_id integer not null,
+  ativo boolean not null,
   foreign key(turma_id) references turma(turma_id),
   foreign key(aluno_id) references pessoa(pessoa_id),
   primary key(aluno_id)
