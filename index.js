@@ -11,6 +11,7 @@ const gerentesRouter = require('./routers/gerentes.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const connString = process.argv[2];
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,3 +29,5 @@ app.use('/gerentes', gerentesRouter);
 app.listen(PORT, () => {
   console.log(`Acesse atraves de http://localhost:${PORT}`);
 });
+
+module.exports = connString;
