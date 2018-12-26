@@ -8,6 +8,7 @@ const alunosRouter = require('./routers/alunos.js');
 const pessoasRouter = require('./routers/pessoas.js');
 const telefonesRouter = require('./routers/telefones.js');
 const gerentesRouter = require('./routers/gerentes.js');
+const loginRouter = require('./routers/login.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
   res.send('Servidor funcionando');
 });
 
+app.use('/login', loginRouter);
 app.use('/turmas', turmasRouter);
 app.use('/pessoas', pessoasRouter);
 app.use('/alunos', alunosRouter);

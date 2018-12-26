@@ -22,7 +22,7 @@ controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
     const client = await pool.connect();
-    const queryStr = 'SELECT * FROM gerente WHERE gerente_id = $1';
+    const queryStr = 'SELECT * FROM gerente WHERE gerenteId = $1';
     const result = await client.query(queryStr, [id]);
     client.release();
     const results = result.rows;
@@ -48,7 +48,7 @@ controller.save = async (req, res) => {
       gerenteId, login, senha, superUser,
     } = req.body;
     const client = await pool.connect();
-    const queryStr = 'INSERT INTO gerente (gerente_id, login, senha, superUser) VALUES ($1, $2, $3, $4) RETURNING *';
+    const queryStr = 'INSERT INTO gerente (gerenteId, login, senha, superUser) VALUES ($1, $2, $3, $4) RETURNING *';
     const result = await client.query(queryStr, [gerenteId, login, senha, superUser]);
     client.release();
     const results = result.rows[0];

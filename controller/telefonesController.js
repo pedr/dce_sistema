@@ -21,7 +21,7 @@ controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
     const client = await pool.connect();
-    const queryStr = 'SELECT * FROM aluno WHERE telefone_id = $1';
+    const queryStr = 'SELECT * FROM aluno WHERE telefoneId = $1';
     const result = await client.query(queryStr, [id]);
     client.release();
     const results = result.rows;
@@ -36,7 +36,7 @@ controller.save = async (req, res) => {
   try {
     const { pessoaId, numero } = req.body;
     const client = await pool.connect();
-    const queryStr = 'INSERT INTO telefone (pessoa_id, numero) VALUES ($1, $2) RETURNING *';
+    const queryStr = 'INSERT INTO telefone (pessoaId, numero) VALUES ($1, $2) RETURNING *';
     const result = await client.query(queryStr, [pessoaId, numero]);
     const results = result.rows[0];
     client.release();

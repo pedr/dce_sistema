@@ -21,7 +21,7 @@ controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
     const client = await pool.connect();
-    const queryStr = 'SELECT * FROM pessoa WHERE pessoa_id = $1';
+    const queryStr = 'SELECT * FROM pessoa WHERE pessoaId = $1';
     const result = await client.query(queryStr, [id]);
     client.release();
     const results = result.rows;
