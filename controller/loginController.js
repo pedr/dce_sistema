@@ -14,7 +14,7 @@ async function findGerente(login) {
     const results = await client.query(queryStr, [login]);
     client.release();
 
-    if (results.rows) {
+    if (results.rowCount > 0) {
       return results.rows[0];
     }
     return null;
@@ -31,7 +31,6 @@ async function insertSession(gerenteId, token) {
     await client.query(deleteQry, [gerenteId]);
     const queryStr = 'INSERT INTO session (gerenteId, token) values ($1, $2)';
     const results = await client.query(queryStr, [gerenteId, token]);
-    console.log(results);
     const result = results.rows[0];
     client.release();
     return result;
@@ -59,29 +58,66 @@ async function createToken() {
   }
 }
 
+async function loggingTime(registroId) {
+  try {
+    const client = await pool.connect();
+    const queryStr = 'INSERT INTO registro (gerenteId) values ($1)';
+    await client.query(queryStr, [registroId]);
+    client.release();
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
 controller.verify = async (req, res) => {
+  // 30min
+  const EXPIRING_TIME = 1800000;
   const { login, senha } = req.body;
   try {
     const gerente = await findGerente(login);
-    if (gerente === null) return;
+    if (gerente === null) {
+      res.redirect('/login');
+      return;
+    }
 
     const senhaLogin = verifySenha(senha);
     if (gerente.senha !== senhaLogin) {
-      res.json('error');
+      res.redirect('/login');
       return;
     }
+
     const session = await createToken();
-    console.log(gerente);
     const worked = await insertSession(gerente.gerenteid, session);
     if (worked === null) {
-      res.json('error');
+      res.redirect('/login');
       return;
     }
+    const logged = await loggingTime(gerente.gerenteid);
+    if (logged === false) {
+      console.error('não foi possivel salvar o log no registro');
+    }
+
+    res.cookie('maxAge', EXPIRING_TIME);
+    res.cookie('secure', true);
+    res.cookie('httpOnly', true);
     res.cookie('token', session);
     res.json('conseguiu logar');
   } catch (err) {
     console.error(err);
     res.json(err);
+  }
+};
+
+controller.logout = async (req, res) => {
+  try {
+
+    res.send('não tá pronto ainda');
+  } catch (err) {
+    console.error(err);
+    res.send('erro na hora de deslogar');
   }
 };
 

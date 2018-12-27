@@ -32,7 +32,7 @@ create table aluno(
 
 create table gerente(
   gerenteId integer not null,
-  login varchar not null,
+  login varchar unique,
   senha varchar not null,
   superUser boolean not null,
   foreign key(gerenteId) references pessoa(pessoaId),
@@ -42,8 +42,8 @@ create table gerente(
 create table registro(
   registroId  serial not null,
   gerenteId integer not null,
-  dataHoraEntrada timestamp not null,
-  dataHoraSaida timestamp not null,
+  dataHoraEntrada timestamp with time zone default now(),
+  dataHoraSaida timestamp with time zone default (now() + '30 mins'),
   foreign key(gerenteId) references gerente(gerenteId),
   primary key(registroId)
 );
