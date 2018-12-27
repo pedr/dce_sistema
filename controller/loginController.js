@@ -77,7 +77,7 @@ controller.verify = async (req, res) => {
       res.json('error');
       return;
     }
-    res.cookie('session', session);
+    res.cookie('token', session);
     res.json('conseguiu logar');
   } catch (err) {
     console.error(err);

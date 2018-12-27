@@ -1,7 +1,7 @@
 
 const router = require('express').Router();
 
-const controller = require('../controller/turmasController.js');
+const controller = require('../../controller/pessoasController.js');
 
 router.get('/', controller.getAll);
 router.get('/:id', controller.getOne);

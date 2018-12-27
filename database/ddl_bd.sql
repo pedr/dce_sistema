@@ -51,6 +51,6 @@ create table registro(
 create table session(
   gerenteId integer references gerente(gerenteId),
   token varchar,
-  tokenExpDate time default (now() + '30 mins'),
+  tokenExpDate timestamp with time zone default (now() + '30 mins'),
   primary key (gerenteId)
 );
