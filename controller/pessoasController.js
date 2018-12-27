@@ -1,16 +1,13 @@
 
-const pool = require('../database/db.js');
+const db = require('../database/db.js');
 
 const controller = {};
 
 controller.getAll = async (req, res) => {
   try {
-    const client = await pool.connect();
     const queryStr = 'SELECT * FROM pessoa';
-    const result = await client.query(queryStr);
-    client.release();
-    const results = result.rows;
-    res.json(results);
+    const result = await db.plainQuery(queryStr);
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.json(err);
@@ -20,12 +17,9 @@ controller.getAll = async (req, res) => {
 controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
-    const client = await pool.connect();
     const queryStr = 'SELECT * FROM pessoa WHERE pessoaId = $1';
-    const result = await client.query(queryStr, [id]);
-    client.release();
-    const results = result.rows;
-    res.json(results);
+    const result = await db.queryWithArgs(queryStr, [id]);
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.json(err);

@@ -1,18 +1,15 @@
 
-const pool = require('../database/db.js');
+const db = require('../database/db.js');
 
 const controller = {};
 
 async function checkToken(session) {
   try {
-    const client = await pool.connect();
     const queryStr = 'SELECT * FROM session WHERE token = $1 AND tokenexpdate > now()';
-    const results = await client.query(queryStr, [session]);
-    client.release();
-    if (results.rowCount === 0) {
+    const result = await db.queryWithArgs(queryStr, [session]);
+    if (result < 0) {
       return false;
     }
-    const result = results.rows[0];
     return true;
   } catch (err) {
     console.error(err);

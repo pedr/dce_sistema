@@ -3,36 +3,27 @@
 
 const util = require('util');
 const crypto = require('crypto');
-const pool = require('../database/db.js');
+const db = require('../database/db.js');
 
 const controller = {};
 
 async function findGerente(login) {
   try {
-    const client = await pool.connect();
     const queryStr = 'SELECT * FROM gerente WHERE login = $1';
-    const results = await client.query(queryStr, [login]);
-    client.release();
-
-    if (results.rowCount > 0) {
-      return results.rows[0];
-    }
-    return null;
+    const result = await db.queryWithArgs(queryStr, [login]);
+    return result;
   } catch (err) {
-    console.error('findGerente \n', err);
+    console.error(err);
     return null;
   }
 }
 
 async function insertSession(gerenteId, token) {
   try {
-    const client = await pool.connect();
     const deleteQry = 'DELETE FROM session WHERE gerenteId = $1';
-    await client.query(deleteQry, [gerenteId]);
+    await db.queryWithArgs(deleteQry, [gerenteId]);
     const queryStr = 'INSERT INTO session (gerenteId, token) values ($1, $2)';
-    const results = await client.query(queryStr, [gerenteId, token]);
-    const result = results.rows[0];
-    client.release();
+    const result = await db.queryWithArgs(queryStr, [gerenteId, token]);
     return result;
   } catch (err) {
     console.error('create session \n', err);
@@ -60,10 +51,12 @@ async function createToken() {
 
 async function loggingTime(registroId) {
   try {
-    const client = await pool.connect();
     const queryStr = 'INSERT INTO registro (gerenteId) values ($1)';
-    await client.query(queryStr, [registroId]);
-    client.release();
+    const result = await db.queryWithArgs(queryStr, [registroId]);
+
+    if (result === null) {
+      console.error('nao conseguiu hora do logging');
+    }
 
     return true;
   } catch (err) {
@@ -77,7 +70,8 @@ controller.verify = async (req, res) => {
   const EXPIRING_TIME = 1800000;
   const { login, senha } = req.body;
   try {
-    const gerente = await findGerente(login);
+    const gerentes = await findGerente(login);
+    const gerente = gerentes[0];
     if (gerente === null) {
       res.redirect('/login');
       return;

@@ -10,4 +10,35 @@ const pool = new pg.Pool({
   ssl: true,
 });
 
-module.exports = pool;
+const db = {};
+
+db.plainQuery = async (queryStr) => {
+  try {
+    const client = await pool.connect();
+    const results = await client.query(queryStr);
+    client.release();
+    const result = results.rows;
+    return result;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+db.queryWithArgs = async (queryStr, arrVals) => {
+  try {
+    const client = await pool.connect();
+    const results = await client.query(queryStr, arrVals);
+    client.release();
+    if (results.rows === null) {
+      return null;
+    }
+    const result = results.rows;
+    return result;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+module.exports = db;

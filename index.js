@@ -3,13 +3,16 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const apiRouter = require('./routers/api.js');
 const turmasRouter = require('./routers/api/turmas.js');
 const alunosRouter = require('./routers/api/alunos.js');
 const pessoasRouter = require('./routers/api/pessoas.js');
 const telefonesRouter = require('./routers/api/telefones.js');
-const gerentesRouter = require('./routers/api/gerentes.js');
+
 const loginRouter = require('./routers/login.js');
-const apiRouter = require('./routers/api.js');
+
+const gerentesRouter = require('./routers/api/gerentes.js');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,7 +32,8 @@ app.use('/api/turmas', turmasRouter);
 app.use('/api/pessoas', pessoasRouter);
 app.use('/api/alunos', alunosRouter);
 app.use('/api/telefones', telefonesRouter);
-app.use('/api/gerentes', gerentesRouter);
+
+app.use('/admin/gerentes', gerentesRouter);
 
 app.listen(PORT, () => {
   console.log(`Acesse atraves de http://localhost:${PORT}`);
