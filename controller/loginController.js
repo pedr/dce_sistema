@@ -100,10 +100,7 @@ controller.verify = async (req, res) => {
       console.error('não foi possivel salvar o log no registro');
     }
 
-    res.cookie('maxAge', EXPIRING_TIME);
-    res.cookie('secure', true);
-    res.cookie('httpOnly', true);
-    res.cookie('token', session);
+    res.cookie('token', session, { httpOnly: true, maxAge: EXPIRING_TIME });
     res.json('conseguiu logar');
   } catch (err) {
     console.error(err);

@@ -13,8 +13,6 @@ async function checkToken(session) {
       return false;
     }
     const result = results.rows[0];
-    console.log(result);
-    console.log(result.tokenexpdate);
     return true;
   } catch (err) {
     console.error(err);
