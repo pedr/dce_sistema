@@ -2,22 +2,17 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
 
 const apiRouter = require('./routers/api.js');
-const turmasRouter = require('./routers/api/turmas.js');
-const alunosRouter = require('./routers/api/alunos.js');
-const pessoasRouter = require('./routers/api/pessoas.js');
-const telefonesRouter = require('./routers/api/telefones.js');
-
 const loginRouter = require('./routers/login.js');
-
-const gerentesRouter = require('./routers/api/gerentes.js');
-
+const webRouter = require('./routers/web.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const connString = process.argv[2];
 
+app.use(helmet());
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,12 +23,7 @@ app.get('/', (req, res) => {
 
 app.use('/api', apiRouter);
 app.use('/login', loginRouter);
-app.use('/api/turmas', turmasRouter);
-app.use('/api/pessoas', pessoasRouter);
-app.use('/api/alunos', alunosRouter);
-app.use('/api/telefones', telefonesRouter);
-
-app.use('/admin/gerentes', gerentesRouter);
+app.use('/web', webRouter);
 
 app.listen(PORT, () => {
   console.log(`Acesse atraves de http://localhost:${PORT}`);

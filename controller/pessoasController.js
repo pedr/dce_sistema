@@ -26,19 +26,4 @@ controller.getOne = async (req, res) => {
   }
 };
 
-controller.save = async (req, res) => {
-  try {
-    const { nome, sexo, email } = req.body;
-    const client = await pool.connect();
-    const queryStr = 'INSERT INTO pessoa (nome, sexo, email) VALUES ($1, $2, $3) RETURNING *';
-    const result = await client.query(queryStr, [nome, sexo, email]);
-    client.release();
-    const results = result.rows[0];
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.json(err);
-  }
-};
-
 module.exports = controller;

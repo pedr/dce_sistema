@@ -54,3 +54,16 @@ create table session(
   tokenExpDate timestamp with time zone default (now() + '30 mins'),
   primary key (gerenteId)
 );
+
+create table historicoAluno (
+  gerenteId integer not null,
+  historicoAlunoId serial not null,
+  alunoId integer,
+  dataHora timestamp with time zone default now(),
+  tipo boolean not null,
+  copiaCorreta integer not null,
+  copiaErrada integer not null,
+  foreign key (gerenteId) references gerente(gerenteId),
+  foreign key (alunoId) references aluno(alunoId),
+  primary key (historicoAlunoId)
+);

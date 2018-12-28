@@ -26,16 +26,4 @@ controller.getOne = async (req, res) => {
   }
 };
 
-controller.save = async (req, res) => {
-  try {
-    const { nome } = req.body;
-    const queryStr = 'INSERT INTO turma (nome) VALUES ($1)';
-    const result = await db.queryWithArgs(queryStr, [nome]);
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.json(err);
-  }
-};
-
 module.exports = controller;

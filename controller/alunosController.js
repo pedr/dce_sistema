@@ -26,16 +26,4 @@ controller.getOne = async (req, res) => {
   }
 };
 
-controller.save = async (req, res) => {
-  try {
-    const { alunoId, turmaId, matricula } = req.body;
-    const queryStr = 'INSERT INTO aluno (alunoId, turmaId, matricula) VALUES ($1, $2, $3) RETURNING *';
-    const result = await db.queryWithArgs(queryStr, [alunoId, turmaId, matricula]);
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.json(err);
-  }
-};
-
 module.exports = controller;

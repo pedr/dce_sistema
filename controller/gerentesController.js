@@ -8,6 +8,10 @@ controller.getAll = async (req, res) => {
   try {
     const queryStr = 'SELECT * FROM gerente';
     const result = await db.plainQuery(queryStr);
+    for (const gerente of result) {
+      delete gerente.senha;
+    }
+
     res.json(result);
   } catch (err) {
     console.error(err);
@@ -20,6 +24,10 @@ controller.getOne = async (req, res) => {
     const { id } = req.params;
     const queryStr = 'SELECT * FROM gerente WHERE gerenteId = $1';
     const result = await db.queryWithArgs(queryStr, [id]);
+    for (const gerente of result) {
+      delete gerente.senha;
+    }
+
     res.json(result);
   } catch (err) {
     console.error(err);
