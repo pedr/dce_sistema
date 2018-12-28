@@ -17,7 +17,7 @@ controller.getAll = async (req, res) => {
 controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
-    const queryStr = 'SELECT * FROM aluno WHERE historicoAlunoId = $1';
+    const queryStr = 'SELECT * FROM historico WHERE historicoAlunoId = $1';
     const result = await db.queryWithArgs(queryStr, [id]);
     res.json(result);
   } catch (err) {
