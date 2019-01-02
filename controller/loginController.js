@@ -102,10 +102,25 @@ controller.verify = async (req, res) => {
   }
 };
 
+function getCookies(cookieString) {
+  const cookiesArray = cookieString.split('; ').map(ele => ele.split('='));
+
+  const cookies = cookiesArray.reduce((total, next) => {
+    const [key, val] = next;
+    // eslint-disable-next-line no-param-reassign
+    total[key] = val;
+    return total;
+  }, {});
+  return cookies;
+}
+
+
 controller.logout = async (req, res) => {
   try {
-
-    res.send('não tá pronto ainda');
+    const { token } = getCookies(req.headers.cookie);
+    const queryStr = 'DELETE FROM session WHERE token = $1';
+    const result = await db.queryWithArgs(queryStr, [token]);
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.send('erro na hora de deslogar');
