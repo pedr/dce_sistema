@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-  res.send('Servidor funcionando');
+  res.send('Servidor funcionando, testando deploy automaticando qnd github atualiza');
 });
 
 app.use('/api', apiRouter);
