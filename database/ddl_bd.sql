@@ -49,10 +49,10 @@ create table registro(
 );
 
 create table session(
-  gerenteId integer references gerente(gerenteId),
+  registroId integer references registro(registroId),
   token varchar,
   tokenExpDate timestamp with time zone default (now() + '30 mins'),
-  primary key (gerenteId)
+  primary key (registroId)
 );
 
 create table historicoAluno (

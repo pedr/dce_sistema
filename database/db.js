@@ -10,7 +10,7 @@ const pool = new pg.Pool({
   ssl: true,
 });
 
-const db = {};
+const db = { pool };
 
 db.plainQuery = async (queryStr) => {
   try {

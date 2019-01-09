@@ -20,9 +20,7 @@ async function findGerente(login) {
 
 async function insertSession(gerenteId, token) {
   try {
-    const deleteQry = 'DELETE FROM session WHERE gerenteId = $1';
-    await db.queryWithArgs(deleteQry, [gerenteId]);
-    const queryStr = 'INSERT INTO session (gerenteId, token) values ($1, $2)';
+    const queryStr = 'INSERT INTO session (registroId, token) values ($1, $2)';
     const result = await db.queryWithArgs(queryStr, [gerenteId, token]);
     return result;
   } catch (err) {
@@ -49,16 +47,18 @@ async function createToken() {
   }
 }
 
-async function loggingTime(registroId) {
+async function loggingTime(gerenteId) {
   try {
-    const queryStr = 'INSERT INTO registro (gerenteId) values ($1)';
-    const result = await db.queryWithArgs(queryStr, [registroId]);
+    const queryStr = 'INSERT INTO registro (gerenteId) values ($1) RETURNING *';
+    const results = await db.queryWithArgs(queryStr, [gerenteId]);
 
-    if (result === null) {
+    if (results === null) {
       console.error('nao conseguiu hora do logging');
     }
 
-    return true;
+    const result = results[0];
+
+    return result;
   } catch (err) {
     console.error(err);
     return null;
@@ -83,15 +83,18 @@ controller.verify = async (req, res) => {
       return;
     }
 
-    const session = await createToken();
-    const worked = await insertSession(gerente.gerenteid, session);
-    if (worked === null) {
+    const registro = await loggingTime(gerente.gerenteid);
+    if (registro === null) {
+      console.error('não foi possivel salvar o log no registro');
       res.redirect('/login');
       return;
     }
-    const logged = await loggingTime(gerente.gerenteid);
-    if (logged === false) {
-      console.error('não foi possivel salvar o log no registro');
+
+    const session = await createToken();
+    const worked = await insertSession(registro.registroid, session);
+    if (worked === null) {
+      res.redirect('/login');
+      return;
     }
 
     res.cookie('token', session, { httpOnly: true, maxAge: EXPIRING_TIME });
@@ -118,8 +121,17 @@ function getCookies(cookieString) {
 controller.logout = async (req, res) => {
   try {
     const { token } = getCookies(req.headers.cookie);
-    const queryStr = 'DELETE FROM session WHERE token = $1';
-    const result = await db.queryWithArgs(queryStr, [token]);
+    const selectQry = 'SELECT * FROM session WHERE token = $1';
+    const selectResult = await db.queryWithArgs(selectQry, [token]);
+    console.log(selectResult);
+    const { registroid } = selectResult[0];
+
+    const updateQry = 'UPDATE registro SET datahorasaida = now() WHERE registroid = $1';
+    const updateResult = await db.queryWithArgs(updateQry, [registroid]);
+    console.log(updateResult);
+
+    const queryStr = 'DELETE FROM session WHERE registroid = $1';
+    const result = await db.queryWithArgs(queryStr, [registroid]);
     res.json(result);
   } catch (err) {
     console.error(err);
