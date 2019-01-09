@@ -95,7 +95,7 @@ controller.verify = async (req, res) => {
     }
 
     res.cookie('token', session, { httpOnly: true, maxAge: EXPIRING_TIME });
-    res.json('conseguiu logar');
+    res.redirect('/web/');
   } catch (err) {
     console.error(err);
     res.json(err);

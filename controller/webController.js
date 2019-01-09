@@ -37,13 +37,13 @@ controller.isLogged = async (req, res, next) => {
   }
   const { token } = getCookies(req.headers.cookie);
   if (token === null) {
-    res.redirect('/');
+    res.redirect('/error');
     return;
   }
   try {
     const isLogged = await checkToken(token);
     if (isLogged === false) {
-      res.redirect('/');
+      res.redirect('/error');
       return;
     }
   } catch (err) {
@@ -53,5 +53,8 @@ controller.isLogged = async (req, res, next) => {
   next();
 };
 
-module.exports = controller;
+controller.home = async (req, res) => {
+  res.render('home.ejs');
+};
 
+module.exports = controller;
