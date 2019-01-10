@@ -4,6 +4,7 @@
 const util = require('util');
 const crypto = require('crypto');
 const db = require('../database/db.js');
+const { getCookies } = require('./utils.js');
 
 const controller = {};
 
@@ -105,34 +106,19 @@ controller.verify = async (req, res) => {
   }
 };
 
-function getCookies(cookieString) {
-  const cookiesArray = cookieString.split('; ').map(ele => ele.split('='));
-
-  const cookies = cookiesArray.reduce((total, next) => {
-    const [key, val] = next;
-    // eslint-disable-next-line no-param-reassign
-    total[key] = val;
-    return total;
-  }, {});
-  return cookies;
-}
-
-
 controller.logout = async (req, res) => {
   try {
     const { token } = getCookies(req.headers.cookie);
     const selectQry = 'SELECT * FROM session WHERE token = $1';
     const selectResult = await db.queryWithArgs(selectQry, [token]);
-    console.log(selectResult);
     const { registroid } = selectResult[0];
 
     const updateQry = 'UPDATE registro SET datahorasaida = now() WHERE registroid = $1';
-    const updateResult = await db.queryWithArgs(updateQry, [registroid]);
-    console.log(updateResult);
+    await db.queryWithArgs(updateQry, [registroid]);
 
     const queryStr = 'DELETE FROM session WHERE registroid = $1';
-    const result = await db.queryWithArgs(queryStr, [registroid]);
-    res.json(result);
+    await db.queryWithArgs(queryStr, [registroid]);
+    res.redirect('/login');
   } catch (err) {
     console.error(err);
     res.send('erro na hora de deslogar');
