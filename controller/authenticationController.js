@@ -1,6 +1,5 @@
 
 const jwt = require('jsonwebtoken');
-const authConfig = require('./config/auth.json');
 
 const controller = {};
 
@@ -23,7 +22,7 @@ controller.verifyJWT = (req, res, next) => {
     return res.send('bearer nao encontrado, token malformated');
   }
 
-  jwt.verify(token, authConfig.secret, (err, decoded) => {
+  jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) return res.send('error token invalido');
 
     req.userId = decoded.id;
