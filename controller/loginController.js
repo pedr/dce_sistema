@@ -4,7 +4,10 @@
 const util = require('util');
 const crypto = require('crypto');
 const db = require('../database/db.js');
+const jwt = require('jsonwebtoken');
 const { getCookies } = require('./utils.js');
+
+const authConfig = require('./config/auth');
 
 const controller = {};
 
@@ -98,8 +101,12 @@ controller.verify = async (req, res) => {
       return;
     }
 
+    const token = jwt.sign({ id: gerente.gerenteid }, authConfig.secret, {
+      expiresIn: 1800,
+    });
+
     res.cookie('token', session, { httpOnly: true, maxAge: EXPIRING_TIME });
-    res.redirect('/web/');
+    res.json({ token });
   } catch (err) {
     console.error(err);
     res.json(err);
