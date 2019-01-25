@@ -134,7 +134,6 @@ controller.logout = async (req, res) => {
 };
 
 controller.registrar = async (req, res) => {
-
   const schema = Joi.object().keys({
     nome: Joi.string().regex(/^[a-zA-Z ]{4,50}$/).required(),
     email: Joi.string().email().required(),
@@ -149,7 +148,7 @@ controller.registrar = async (req, res) => {
     const validate = Joi.validate(data, schema);
 
     if (validate.error !== null) {
-      res.send('faltou algum dado, nome, email, sexo, senha confirmarSenha');
+      res.json(validate.error, 'faltou algum dado, nome, email, sexo, senha confirmarSenha');
       return;
     }
 

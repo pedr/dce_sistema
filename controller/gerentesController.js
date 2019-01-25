@@ -1,4 +1,3 @@
-
 const crypto = require('crypto');
 const db = require('../database/db.js');
 
@@ -45,10 +44,15 @@ controller.encrypt = (req, res, next) => {
 };
 
 async function addGerente(gerenteId, login, senha, superUser = false) {
-  const queryStr = 'INSERT INTO gerente (gerenteId, login, senha, superUser) VALUES ($1, $2, $3, $4) RETURNING *';
-  const result = await db.queryWithArgs(queryStr, [gerenteId, login, senha, superUser]);
+  try {
+    const queryStr = 'INSERT INTO gerente (gerenteId, login, senha, superUser) VALUES ($1, $2, $3, $4) RETURNING *';
+    const result = await db.queryWithArgs(queryStr, [gerenteId, login, senha, superUser]);
 
-  return { ok: true, content: result };
+    return { ok: true, content: result };
+  } catch (err) {
+    console.error(err);
+    return { ok: false, content: err };
+  }
 }
 
 controller.save = async (req, res) => {

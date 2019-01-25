@@ -24,7 +24,6 @@ controller.verifyJWT = (req, res, next) => {
 
   jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) return res.send('error token invalido');
-
     req.userId = decoded.id;
     return next();
   });
