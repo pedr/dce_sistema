@@ -4,6 +4,7 @@
 const util = require('util');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const Joi = require('joi');
 const db = require('../database/db.js');
 const { getCookies } = require('./utils.js');
 const { addPessoa } = require('./pessoasController.js');
@@ -133,14 +134,28 @@ controller.logout = async (req, res) => {
 };
 
 controller.registrar = async (req, res) => {
+
+  const schema = Joi.object().keys({
+    nome: Joi.string().regex(/^[a-zA-Z ]{4,50}$/).required(),
+    email: Joi.string().email().required(),
+    login: Joi.string().alphanum().min(3).max(20).required(),
+    senha: Joi.string().alphanum().min(6).max(20).required(),
+    confirmarSenha: Joi.string().alphanum().min(6).max(20).required(),
+    sexo: Joi.string().regex(/^[mfMF]$/),
+  });
+
   try {
-    const {
-      nome, email, login, senha, sexo, confirmarSenha,
-    } = req.body;
-    if (!nome || !login || !email || !sexo || !senha || !confirmarSenha) {
+    const data = req.body;
+    const validate = Joi.validate(data, schema);
+
+    if (validate.error !== null) {
       res.send('faltou algum dado, nome, email, sexo, senha confirmarSenha');
       return;
     }
+
+    const {
+      nome, email, login, senha, confirmarSenha, sexo,
+    } = data;
 
     if (senha !== confirmarSenha) {
       res.send('senha invalida');
