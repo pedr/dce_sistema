@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 5000;
 const connString = process.argv[2];
 
 app.use(helmet());
-app.use(express.static('public'));
+app.use(express.static('dist'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
