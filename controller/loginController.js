@@ -3,11 +3,12 @@
 
 const util = require('util');
 const crypto = require('crypto');
-const db = require('../database/db.js');
 const jwt = require('jsonwebtoken');
+const Joi = require('joi');
+const db = require('../database/db.js');
 const { getCookies } = require('./utils.js');
-
-const authConfig = require('./config/auth');
+const { addPessoa } = require('./pessoasController.js');
+const { addGerente } = require('./gerentesController.js');
 
 const controller = {};
 
@@ -101,7 +102,7 @@ controller.verify = async (req, res) => {
       return;
     }
 
-    const token = jwt.sign({ id: gerente.gerenteid }, authConfig.secret, {
+    const token = jwt.sign({ id: gerente.gerenteid }, process.env.SECRET, {
       expiresIn: 1800,
     });
 
@@ -129,6 +130,52 @@ controller.logout = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.send('erro na hora de deslogar');
+  }
+};
+
+controller.registrar = async (req, res) => {
+  const schema = Joi.object().keys({
+    nome: Joi.string().regex(/^[a-zA-Z ]{4,50}$/).required(),
+    email: Joi.string().email().required(),
+    login: Joi.string().alphanum().min(3).max(20).required(),
+    senha: Joi.string().alphanum().min(6).max(20).required(),
+    confirmarSenha: Joi.string().alphanum().min(6).max(20).required(),
+    sexo: Joi.string().regex(/^[mfMF]$/),
+  });
+
+  try {
+    const data = req.body;
+    const validate = Joi.validate(data, schema);
+
+    if (validate.error !== null) {
+      res.json(validate.error, 'faltou algum dado, nome, email, sexo, senha confirmarSenha');
+      return;
+    }
+
+    const {
+      nome, email, login, senha, confirmarSenha, sexo,
+    } = data;
+
+    if (senha !== confirmarSenha) {
+      res.send('senha invalida');
+      return;
+    }
+
+    const pessoa = await addPessoa(nome, email, sexo);
+
+    if (!pessoa.ok) {
+      res.send('não conseguiu registrar pessoa');
+      return;
+    }
+
+    const { pessoaid } = pessoa.content;
+
+    const gerente = await addGerente(pessoaid, login, senha, false);
+
+    res.send(gerente);
+    return;
+  } catch (err) {
+    res.send(err);
   }
 };
 
