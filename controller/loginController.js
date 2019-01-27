@@ -139,6 +139,7 @@ controller.registrar = async (req, res) => {
     email: Joi.string().email().required(),
     login: Joi.string().alphanum().min(3).max(20).required(),
     senha: Joi.string().alphanum().min(6).max(20).required(),
+    superUser: Joi.boolean(),
     confirmarSenha: Joi.string().alphanum().min(6).max(20).required(),
     sexo: Joi.string().regex(/^[mfMF]$/),
   });
@@ -153,7 +154,7 @@ controller.registrar = async (req, res) => {
     }
 
     const {
-      nome, email, login, senha, confirmarSenha, sexo,
+      nome, email, login, senha, confirmarSenha, superUser, sexo,
     } = data;
 
     if (senha !== confirmarSenha) {
@@ -170,7 +171,7 @@ controller.registrar = async (req, res) => {
 
     const { pessoaid } = pessoa.content;
 
-    const gerente = await addGerente(pessoaid, login, senha, false);
+    const gerente = await addGerente(pessoaid, login, senha, superUser);
 
     res.send(gerente);
     return;
