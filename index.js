@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const apiRouter = require('./routers/api.js');
 const loginRouter = require('./routers/login.js');
-const webRouter = require('./routers/web.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,7 +28,6 @@ app.get('/', (req, res) => {
 
 app.use('/api', apiRouter);
 app.use('/login', loginRouter);
-app.use('/web', webRouter);
 
 app.listen(PORT, () => {
   console.log(`Acesse atraves de http://localhost:${PORT}`);
