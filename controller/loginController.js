@@ -170,8 +170,9 @@ controller.registrar = async (req, res) => {
     }
 
     const { pessoaid } = pessoa.content;
+    const cryptSenha = verifySenha(senha);
 
-    const gerente = await addGerente(pessoaid, login, senha, superUser);
+    const gerente = await addGerente(pessoaid, login, cryptSenha, superUser);
 
     res.send(gerente);
     return;
