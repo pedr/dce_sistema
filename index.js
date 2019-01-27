@@ -17,9 +17,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 //ESTE TRECHO AUTORIZA REQUISICOES DE DIFERENTES END-POINTS (CROSS ORIGN REQUEST), DESTA FORMA CONSIGO CONSUMIR
 //A API NO MEU AMBIENTE DE DESENVOLVIMENTO, AO COLOCAR O APP EM PRODUÇÃO NUMA VERSÃO ESTÁVEL REMOVER TRECHO ABAIXO.
+
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   next();
 });
 app.get('/', (req, res) => {
