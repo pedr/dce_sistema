@@ -36,7 +36,8 @@ create table gerente(
   senha varchar not null,
   superUser boolean not null,
   foreign key(gerenteId) references pessoa(pessoaId),
-  primary key(gerenteId)
+  primary key(gerenteId),
+  contaAtiva boolean not null
 );
 
 create table registro(
@@ -48,22 +49,15 @@ create table registro(
   primary key(registroId)
 );
 
-create table session(
-  registroId integer references registro(registroId),
-  token varchar,
-  tokenExpDate timestamp with time zone default (now() + '30 mins'),
-  primary key (registroId)
-);
-
-create table historicoAluno (
+create table pedido (
   gerenteId integer not null,
-  historicoAlunoId serial not null,
+  pedidoId serial not null,
   alunoId integer,
   dataHora timestamp with time zone default now(),
-  tipo boolean not null,
+  pedidoAtivo boolean not null,
   copiaCorreta integer not null,
   copiaErrada integer not null,
   foreign key (gerenteId) references gerente(gerenteId),
   foreign key (alunoId) references aluno(alunoId),
-  primary key (historicoAlunoId)
+  primary key (pedidoId)
 );
