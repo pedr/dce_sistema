@@ -1,10 +1,7 @@
 
-const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const Joi = require('joi');
 const db = require('../database/db.js');
-const { addPessoa } = require('./pessoasController.js');
-const { addGerente } = require('./gerentesController.js');
+const { encryptarSenha } = require('./utils.js');
 
 const controller = {};
 
@@ -17,12 +14,6 @@ async function findGerente(login) {
     console.error(err);
     return null;
   }
-}
-
-function encryptarSenha(senha) {
-  const hash = crypto.createHash('sha512');
-  hash.update(senha);
-  return hash.digest('hex');
 }
 
 async function loggingTime(gerenteId) {
@@ -93,54 +84,6 @@ controller.logout = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.send('erro na hora de deslogar');
-  }
-};
-
-controller.registrar = async (req, res) => {
-  const schema = Joi.object().keys({
-    nome: Joi.string().regex(/^[a-zA-Z ]{4,50}$/).required(),
-    email: Joi.string().email().required(),
-    login: Joi.string().alphanum().min(3).max(20).required(),
-    senha: Joi.string().alphanum().min(6).max(20).required(),
-    superUser: Joi.boolean(),
-    confirmarSenha: Joi.string().alphanum().min(6).max(20).required(),
-    sexo: Joi.string().regex(/^[mfMF]$/),
-  });
-
-  try {
-    const data = req.body;
-    const validate = Joi.validate(data, schema);
-
-    if (validate.error !== null) {
-      res.json(validate.error, 'faltou algum dado, nome, email, sexo, senha confirmarSenha');
-      return;
-    }
-
-    const {
-      nome, email, login, senha, confirmarSenha, superUser, sexo,
-    } = data;
-
-    if (senha !== confirmarSenha) {
-      res.send('senha invalida');
-      return;
-    }
-
-    const pessoa = await addPessoa(nome, email, sexo);
-
-    if (!pessoa.ok) {
-      res.send('não conseguiu registrar pessoa');
-      return;
-    }
-
-    const { pessoaid } = pessoa.content;
-    const cryptSenha = encryptarSenha(senha);
-
-    const gerente = await addGerente(pessoaid, login, cryptSenha, superUser);
-
-    res.send(gerente);
-    return;
-  } catch (err) {
-    res.send(err);
   }
 };
 

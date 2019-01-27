@@ -8,7 +8,7 @@ const telefonesRouter = require('./api/telefones.js');
 const gerentesRouter = require('./api/gerentes.js');
 const registrosRouter = require('./api/registros.js');
 const historicosRouter = require('./api/historicos.js');
-const authenticationRouter = require('./authentication.js');
+const authenticationRouter = require('../middleware/authentication.js');
 
 router.use('/', authenticationRouter);
 router.use('/turmas', turmasRouter);

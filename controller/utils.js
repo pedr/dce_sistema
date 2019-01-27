@@ -1,4 +1,6 @@
 
+const crypto = require('crypto');
+
 function getCookies(cookieString) {
   const cookiesArray = cookieString.split('; ').map(ele => ele.split('='));
 
@@ -11,6 +13,13 @@ function getCookies(cookieString) {
   return cookies;
 }
 
+function encryptarSenha(senha) {
+  const hash = crypto.createHash('sha512');
+  hash.update(senha);
+  return hash.digest('hex');
+}
+
 module.exports = {
   getCookies,
+  encryptarSenha,
 };
