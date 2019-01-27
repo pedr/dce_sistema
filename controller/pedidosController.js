@@ -25,9 +25,9 @@ controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
     const queryStr = `SELECT * FROM pedido pe 
-    LEFT JOIN gerente g on g.gerenteid = h.gerenteid
+    LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
     LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
-    WHERE pedidoId = $1`;
+    WHERE pe.pedidoId = $1`;
     const result = await db.queryWithArgs(queryStr, [id]);
     delete result[0].senha;
     res.json(result[0]);
