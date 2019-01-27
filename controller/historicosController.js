@@ -1,14 +1,20 @@
 
-const Joi  = require('joi');
+const Joi = require('joi');
 const db = require('../database/db.js');
 
 const controller = {};
 
 controller.getAll = async (req, res) => {
   try {
-    const queryStr = 'SELECT * FROM historicoAluno';
+    const queryStr = `SELECT * FROM historicoAluno h 
+    LEFT JOIN gerente g on g.gerenteid = h.gerenteid
+    LEFT JOIN pessoa p on p.pessoaid = g.gerenteid`;
     const result = await db.plainQuery(queryStr);
-    res.json(result);
+    const filtrado = result.map((a) => {
+      delete a.senha;
+      return a;
+    });
+    res.json(filtrado);
   } catch (err) {
     console.error(err);
     res.json(err);
@@ -18,9 +24,13 @@ controller.getAll = async (req, res) => {
 controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
-    const queryStr = 'SELECT * FROM historico WHERE historicoAlunoId = $1';
+    const queryStr = `SELECT * FROM historicoAluno h 
+    LEFT JOIN gerente g on g.gerenteid = h.gerenteid
+    LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
+    WHERE historicoAlunoId = $1`;
     const result = await db.queryWithArgs(queryStr, [id]);
-    res.json(result);
+    delete result[0].senha;
+    res.json(result[0]);
   } catch (err) {
     console.error(err);
     res.json(err);
