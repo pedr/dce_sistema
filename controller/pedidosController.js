@@ -142,7 +142,8 @@ controller.byDate = async (req, res) => {
     FROM pedido pe
     LEFT JOIN gerente g ON g.gerenteid = pe.gerenteid
     LEFT JOIN pessoa p ON g.gerenteid = p.pessoaid
-    WHERE pe.dataHora >= $1 AND pe.dataHora <= $2`;
+    WHERE pe.dataHora >= $1 AND pe.dataHora <= $2
+    ORDER BY pe.dataHora DESC`;
 
     const result = await db.queryWithArgs(querySearch, [psqlInital, psqlFinal]);
 
@@ -165,7 +166,8 @@ controller.byDate = async (req, res) => {
   }
 };
 
-async function addPedido(gerenteId, alunoId = null, pedidoAtivo = true, copiaErrada, copiaCorreta) {
+async function addPedido(gerenteId = null, alunoId = null,
+  pedidoAtivo = true, copiaErrada, copiaCorreta) {
   try {
     const queryStr = 'INSERT INTO pedido (gerenteId, alunoId, pedidoAtivo, copiaCorreta, copiaErrada) VALUES ($1, $2, $3, $4, $5) RETURNING *';
     const result = await db.queryWithArgs(queryStr,
@@ -179,7 +181,7 @@ async function addPedido(gerenteId, alunoId = null, pedidoAtivo = true, copiaErr
 
 controller.add = async (req, res) => {
   const schema = Joi.object().keys({
-    gerenteId: Joi.number().integer().required(),
+    gerenteId: Joi.number().integer(),
     alunoId: Joi.number().integer(),
     pedidoAtivo: Joi.boolean(),
     copiaErrada: Joi.number().min(0).required(),
@@ -194,9 +196,10 @@ controller.add = async (req, res) => {
       res.send('algum dado errado {gerenteId, alunoId, pedidoAtivo, copiaErrada, copiaCorreta}');
       return;
     }
+    const gerenteId = req.userId;
 
     const {
-      gerenteId, alunoId, pedidoAtivo, copiaErrada, copiaCorreta,
+      alunoId, pedidoAtivo, copiaErrada, copiaCorreta,
     } = data;
 
     const result = await addPedido(gerenteId, alunoId, pedidoAtivo, copiaErrada, copiaCorreta);
