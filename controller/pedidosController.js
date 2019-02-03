@@ -8,7 +8,8 @@ controller.getAll = async (req, res) => {
   try {
     const queryStr = `SELECT * FROM pedido pe 
     LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
-    LEFT JOIN pessoa p on p.pessoaid = g.gerenteid`;
+    LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
+    ORDER BY pe.pedidoid desc`;
     const result = await db.plainQuery(queryStr);
     const filtrado = result.map((a) => {
       delete a.senha;
@@ -43,7 +44,8 @@ controller.getByName = async (req, res) => {
     LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
     LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
     WHERE g.login LIKE '%' || $1 || '%' OR
-    p.nome LIKE '%' || $1 || '%'`;
+    p.nome LIKE '%' || $1 || '%'
+    ORDER BY pe.pedidoid DESC`;
     const result = await db.queryWithArgs(querySearch, [search]);
     const filtrado = result.map((a) => {
       delete a.senha;
@@ -143,7 +145,7 @@ controller.byDate = async (req, res) => {
     LEFT JOIN gerente g ON g.gerenteid = pe.gerenteid
     LEFT JOIN pessoa p ON g.gerenteid = p.pessoaid
     WHERE pe.dataHora >= $1 AND pe.dataHora <= $2
-    ORDER BY pe.dataHora DESC`;
+    ORDER BY pe.pedidoid desc`;
 
     const result = await db.queryWithArgs(querySearch, [psqlInital, psqlFinal]);
 
