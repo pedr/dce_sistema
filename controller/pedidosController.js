@@ -21,9 +21,11 @@ const ALL_DATA_BESIDES_PASSWORD = `
 
 controller.getAll = async (req, res) => {
   try {
-    const queryStr = `SELECT * FROM pedido pe 
+    const queryStr = `SELECT ${ALL_DATA_BESIDES_PASSWORD}
+    FROM pedido pe 
     LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
     LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
+    WHERE pe.pedidoativo = true
     ORDER BY pe.pedidoid desc`;
     const result = await db.plainQuery(queryStr);
     const filtrado = result.map((a) => {
@@ -40,10 +42,11 @@ controller.getAll = async (req, res) => {
 controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
-    const queryStr = `SELECT * FROM pedido pe 
+    const queryStr = `SELECT ${ALL_DATA_BESIDES_PASSWORD}
+    FROM pedido pe 
     LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
     LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
-    WHERE pe.pedidoId = $1`;
+    WHERE pe.pedidoId = $1 AND pe.pedidoativo = true`;
     const result = await db.queryWithArgs(queryStr, [id]);
     delete result[0].senha;
     res.json(result[0]);
@@ -80,7 +83,8 @@ controller.search = async (req, res) => {
     LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
     LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
     WHERE (g.login LIKE '%' || $1 || '%' OR p.nome LIKE '%' || $1 || '%') AND 
-    (pe.datahora >= $2 AND pe.datahora <= $3)`;
+    pe.pedidoativo = true AND
+    (pe.datahora >= $2 AND pe.datahora <= ($3))`;
 
     if (name === undefined) {
       name = '';
@@ -91,7 +95,7 @@ controller.search = async (req, res) => {
     }
 
     if (finalDate === undefined) {
-      finalDate = 'now()';
+      finalDate = `now()`;
     }
 
     const result = await db.queryWithArgs(queryToDb, [name, initialDate, finalDate]);
@@ -107,16 +111,22 @@ controller.search = async (req, res) => {
   }
 };
 
-async function addPedido(gerenteId = null, alunoId = null,
-  pedidoAtivo = true, copiaErrada, copiaCorreta) {
+async function addPedido(
+  gerenteId = null,
+  alunoId = null,
+  pedidoAtivo = true,
+  copiaErrada,
+  copiaCorreta,
+  dataHora = `now() - INTERVAL '2 hour'`,
+) {
   try {
-    const queryStr = 'INSERT INTO pedido (gerenteId, alunoId, pedidoAtivo, copiaCorreta, copiaErrada) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    const queryStr = 'INSERT INTO pedido (gerenteId, alunoId, pedidoAtivo, copiaCorreta, copiaErrada, dataHora) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
     const result = await db.queryWithArgs(queryStr,
-      [gerenteId, alunoId, pedidoAtivo, copiaCorreta, copiaErrada]);
+      [gerenteId, alunoId, pedidoAtivo, copiaCorreta, copiaErrada, dataHora]);
     return { ok: true, content: result[0] };
   } catch (err) {
     console.error(err);
-    return { ok: false, content: 'precisa => gerenteId, copiaErrada, copiaCorreta, opcional => pedidoAtivo, alunoId' };
+    return { ok: false, content: 'precisa => gerenteId, copiaErrada, copiaCorreta, opcional => pedidoAtivo, alunoId, dataHora' };
   }
 }
 
@@ -140,15 +150,36 @@ controller.add = async (req, res) => {
     const gerenteId = req.userId;
 
     const {
-      alunoId, pedidoAtivo, copiaErrada, copiaCorreta,
+      alunoId, pedidoAtivo, copiaErrada, copiaCorreta, dataHora,
     } = data;
 
-    const result = await addPedido(gerenteId, alunoId, pedidoAtivo, copiaErrada, copiaCorreta);
+    const result = await addPedido(
+      gerenteId,
+      alunoId,
+      pedidoAtivo,
+      copiaErrada,
+      copiaCorreta,
+      dataHora,
+    );
 
     res.json(result);
   } catch (err) {
     console.error(err);
     res.json(err);
+  }
+};
+
+controller.changeState = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const queryStr = 'UPDATE pedido SET pedidoativo = NOT pedidoativo WHERE pedidoid = $1 RETURNING *';
+    const result = await db.queryWithArgs(queryStr, [id]);
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(401);
   }
 };
 

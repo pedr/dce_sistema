@@ -14,10 +14,10 @@ controller.getAll = async (req, res) => {
   }
 };
 
-async function addPessoa(nome, email, sexo) {
+async function addPessoa(nome, email, sexo = 'm') {
   try {
-    if (!nome || !email || !sexo) {
-      return { ok: false, content: 'falta dados, precisa de nome, email e sexo' };
+    if (!nome || !email) {
+      return { ok: false, content: 'falta dados, precisa de nome, email ' };
     }
 
     if (sexo.length !== 1) {
