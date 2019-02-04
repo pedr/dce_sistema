@@ -60,7 +60,7 @@ function addCopias(pedidos) {
     copiasErradasTotais: 0,
     totalDePedidos: 0,
   };
-  pedidos.forEach(obj => {
+  pedidos.forEach((obj) => {
     result.copiasCorretasTotais += obj.copiacorreta;
     result.copiasErradasTotais += obj.copiaerrada;
     result.totalDePedidos += 1;
@@ -72,8 +72,9 @@ function addCopias(pedidos) {
 controller.search = async (req, res) => {
   try {
     let {
-      name, initialDate, finalDate, format
+      name, initialDate, finalDate,
     } = req.query;
+    const { format } = req.query;
 
     const queryToDb = `SELECT ${ALL_DATA_BESIDES_PASSWORD} FROM pedido pe
     LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
@@ -95,7 +96,8 @@ controller.search = async (req, res) => {
 
     const result = await db.queryWithArgs(queryToDb, [name, initialDate, finalDate]);
     if (format === 'sum') {
-      return res.json(addCopias(result));
+      res.json(addCopias(result));
+      return;
     }
 
     res.json(result);
