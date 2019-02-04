@@ -68,23 +68,4 @@ controller.verify = async (req, res) => {
   }
 };
 
-controller.logout = async (req, res) => {
-  try {
-    /*
-    const { userId } = req;
-    console.log(userId);
-    const getRegistro = 'SELECT * FROM registro WHERE gerenteid = $1
-      ORDER BY datahoraentrada DESC LIMIT 1';
-    const registroid = await db.queryWithArgs(getRegistro, [userId]);
-    const updateQry = 'UPDATE registro SET datahorasaida = now() WHERE registroid = $1';
-    await db.queryWithArgs(updateQry, [registroid]);
-    */
-
-    res.redirect('/login');
-  } catch (err) {
-    console.error(err);
-    res.send('erro na hora de deslogar');
-  }
-};
-
 module.exports = controller;

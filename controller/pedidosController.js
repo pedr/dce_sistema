@@ -28,16 +28,29 @@ controller.getAll = async (req, res) => {
     WHERE pe.pedidoativo = true
     ORDER BY pe.pedidoid desc`;
     const result = await db.plainQuery(queryStr);
-    const filtrado = result.map((a) => {
-      delete a.senha;
-      return a;
-    });
-    res.json(filtrado);
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.json(err);
   }
 };
+
+controller.getAllNotActive = async (req, res) => {
+  try {
+    const queryStr = `SELECT ${ALL_DATA_BESIDES_PASSWORD}
+    FROM pedido pe 
+    LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
+    LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
+    WHERE pe.pedidoativo = false
+    ORDER BY pe.pedidoid desc`;
+    const result = await db.plainQuery(queryStr);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.json(err);
+  }
+};
+
 
 controller.getOne = async (req, res) => {
   try {
@@ -137,21 +150,23 @@ controller.add = async (req, res) => {
     pedidoAtivo: Joi.boolean(),
     copiaErrada: Joi.number().min(0).required(),
     copiaCorreta: Joi.number().min(0).required(),
+    data: Joi.date(),
+    hora: Joi.string().regex(/^(2[0-3]|[01][0-9]):([0-5][0-9]:00)$/),
   });
 
   try {
-    const data = req.body;
-    const validate = Joi.validate(data, schema);
+    const content = req.body;
+    const validate = Joi.validate(content, schema);
 
     if (validate.error !== null) {
-      res.send('algum dado errado {gerenteId, alunoId, pedidoAtivo, copiaErrada, copiaCorreta}');
+      res.send('algum dado errado {gerenteId, alunoId, pedidoAtivo, copiaErrada, copiaCorreta, data, hora}');
       return;
     }
     const gerenteId = req.userId;
 
     const {
-      alunoId, pedidoAtivo, copiaErrada, copiaCorreta, dataHora,
-    } = data;
+      alunoId, pedidoAtivo, copiaErrada, copiaCorreta, data, hora,
+    } = content;
 
     const result = await addPedido(
       gerenteId,
@@ -159,7 +174,7 @@ controller.add = async (req, res) => {
       pedidoAtivo,
       copiaErrada,
       copiaCorreta,
-      dataHora,
+      `${data} ${hora}`,
     );
 
     res.json(result);
