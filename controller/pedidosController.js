@@ -4,6 +4,21 @@ const db = require('../database/db.js');
 
 const controller = {};
 
+const ALL_DATA_BESIDES_PASSWORD = `
+      pe.pedidoid,
+      pe.alunoid,
+      pe.datahora,
+      pe.pedidoativo,
+      pe.copiacorreta,
+      pe.copiaerrada,
+      g.login,
+      g.superuser,
+      g.contaativa,
+      p.pessoaid,
+      p.nome,
+      p.sexo,
+      p.email`;
+
 controller.getAll = async (req, res) => {
   try {
     const queryStr = `SELECT * FROM pedido pe 
@@ -21,6 +36,7 @@ controller.getAll = async (req, res) => {
     res.json(err);
   }
 };
+
 controller.getOne = async (req, res) => {
   try {
     const { id } = req.params;
@@ -37,57 +53,6 @@ controller.getOne = async (req, res) => {
   }
 };
 
-controller.getByName = async (req, res) => {
-  try {
-    const { search } = req.query;
-    const querySearch = `SELECT * FROM pedido pe
-    LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
-    LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
-    WHERE g.login LIKE '%' || $1 || '%' OR
-    p.nome LIKE '%' || $1 || '%'
-    ORDER BY pe.pedidoid DESC`;
-    const result = await db.queryWithArgs(querySearch, [search]);
-    const filtrado = result.map((a) => {
-      delete a.senha;
-      return a;
-    });
-
-    res.json(filtrado);
-  } catch (err) {
-    console.error(err);
-    res.json(err);
-  }
-}
-
-function checkIfDateIsValid(date) {
-  if (date.length !== 8) {
-    return false;
-  }
-  const year = date.slice(0, 4);
-  const month = date.slice(4, 6);
-  const day = date.slice(6, 8);
-
-  if (typeof +year !== 'number' || typeof +month !== 'number' || typeof +day !== 'number') {
-    return false;
-  }
-
-  if (month < 1 || month > 12) {
-    return false;
-  }
-
-  if (day < 1 || day > 31) {
-    return false;
-  }
-
-  return true;
-}
-
-function transformDateToPSQL(date) {
-  const year = `${date.slice(0, 4)}-`;
-  const month = `${date.slice(4, 6)}-`;
-  const newDate = `${year}${month}${date.slice(6, 8)}`;
-  return newDate;
-}
 
 function addCopias(pedidos) {
   const result = {
@@ -104,64 +69,36 @@ function addCopias(pedidos) {
   return result;
 }
 
-controller.byDate = async (req, res) => {
+controller.search = async (req, res) => {
   try {
-    const { initial } = req.query;
-    let { final } = req.query;
-    const { format } = req.query;
+    let {
+      name, initialDate, finalDate, format
+    } = req.query;
 
-    const now = new Date();
-    const nowFormatted = (1900 + now.getYear())
-      + ((now.getMonth() + 1).toString().padStart(2, 0))
-      + now.getDate();
+    const queryToDb = `SELECT ${ALL_DATA_BESIDES_PASSWORD} FROM pedido pe
+    LEFT JOIN gerente g on g.gerenteid = pe.gerenteid
+    LEFT JOIN pessoa p on p.pessoaid = g.gerenteid
+    WHERE (g.login LIKE '%' || $1 || '%' OR p.nome LIKE '%' || $1 || '%') AND 
+    (pe.datahora >= $2 AND pe.datahora <= $3)`;
 
-    if (final === null) {
-      final = nowFormatted;
+    if (name === undefined) {
+      name = '';
     }
 
-    if (checkIfDateIsValid(initial) === false) {
-      res.json('invalid date format, should be "YYYYMMDD" ex. 20190101');
-      return;
+    if (initialDate === undefined) {
+      initialDate = '2000-01-01';
     }
 
-    const psqlInital = transformDateToPSQL(initial);
-    const psqlFinal = transformDateToPSQL(final);
-
-    const querySearch = `SELECT 
-      pe.pedidoid,
-      pe.alunoid,
-      pe.datahora,
-      pe.pedidoativo,
-      pe.copiacorreta,
-      pe.copiaerrada,
-      g.login,
-      g.superuser,
-      g.contaativa,
-      p.pessoaid,
-      p.nome,
-      p.sexo,
-      p.email
-    FROM pedido pe
-    LEFT JOIN gerente g ON g.gerenteid = pe.gerenteid
-    LEFT JOIN pessoa p ON g.gerenteid = p.pessoaid
-    WHERE pe.dataHora >= $1 AND pe.dataHora <= $2
-    ORDER BY pe.pedidoid desc`;
-
-    const result = await db.queryWithArgs(querySearch, [psqlInital, psqlFinal]);
-
-    if (format === 'all') {
-      res.json(result);
-      return;
+    if (finalDate === undefined) {
+      finalDate = 'now()';
     }
 
+    const result = await db.queryWithArgs(queryToDb, [name, initialDate, finalDate]);
     if (format === 'sum') {
-      const soma = addCopias(result);
-      soma.dataInicial = psqlInital;
-      soma.dataFinal = psqlFinal;
-      res.json(soma);
-      return;
+      return res.json(addCopias(result));
     }
-    res.json('algo deu errado');
+
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.json(err);

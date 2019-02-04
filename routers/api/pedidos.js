@@ -14,8 +14,7 @@ const controller = require('../../controller/pedidosController.js');
 */
 
 router.get('/', controller.getAll);
-router.get('/search', controller.getByName);
-router.get('/date', controller.byDate);
+router.get('/search', controller.search);
 router.get('/:id', controller.getOne);
 router.post('/', controller.add);
 
