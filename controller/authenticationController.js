@@ -7,6 +7,7 @@ controller.verifyJWT = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization) {
+    console.error('primeiro erro', authorization);
     return res.send('algum erro 1');
   }
 
@@ -24,6 +25,7 @@ controller.verifyJWT = (req, res, next) => {
 
   jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) {
+      console.error('erro 4', err);
       return res.send('algum erro 4');
     }
     req.userId = decoded.id;
