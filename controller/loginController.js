@@ -39,21 +39,21 @@ controller.verify = async (req, res) => {
   try {
     const gerentes = await findGerente(login);
     const gerente = gerentes[0];
-    if (gerente === null) {
-      res.redirect('/login');
+    if (gerente === undefined) {
+      res.status(401).send();
       return;
     }
 
     const senhaLogin = encryptarSenha(senha);
     if (gerente.senha !== senhaLogin) {
-      res.redirect('/login');
+      res.stauts(401).send();
       return;
     }
 
     const registro = await loggingTime(gerente.gerenteid);
     if (registro === null) {
       console.error('não foi possivel salvar o log no registro');
-      res.redirect('/login');
+      res.status(401).send();
       return;
     }
 
@@ -61,10 +61,10 @@ controller.verify = async (req, res) => {
       expiresIn: 1800,
     });
 
-    res.json({ token });
+    res.status(200).json({ token });
   } catch (err) {
     console.error(err);
-    res.json(err);
+    res.status(400).json(err);
   }
 };
 
