@@ -4,16 +4,15 @@ const jwt = require('jsonwebtoken');
 const controller = {};
 
 controller.verifyJWT = (req, res, next) => {
-  const { authorization } = req.headers;
-  console.log(authorization);
-  console.log(req.headers);
+  console.log(req);
+  const { Authorization } = req.headers;
 
-  if (!authorization) {
-    console.error('primeiro erro', authorization);
+  if (!Authorization) {
+    console.error('primeiro erro', Authorization);
     return res.status(400).send('algum erro 1');
   }
 
-  const parts = authorization.split(' ');
+  const parts = Authorization.split(' ');
 
   if (!parts.length === 2) {
     return res.status(400).send('algum erro 2');
