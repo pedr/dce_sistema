@@ -8,7 +8,7 @@ const pedidosRouter = require('./api/pedidos.js');
 const authenticationRouter = require('../middleware/authentication.js');
 const superUserRouter = require('./api/superUser.js');
 
-// router.use('/', authenticationRouter);
+router.use('/', authenticationRouter);
 router.use('/pessoas', pessoasRouter);
 router.use('/gerentes', gerentesRouter);
 router.use('/registros', registrosRouter);

@@ -5,6 +5,8 @@ const controller = {};
 
 controller.verifyJWT = (req, res, next) => {
   const { authorization } = req.headers;
+  console.log(authorization);
+  console.log(req.headers);
 
   if (!authorization) {
     console.error('primeiro erro', authorization);
