@@ -5,7 +5,7 @@ const controller = {};
 
 controller.verifyJWT = (req, res, next) => {
   console.log(req.headers);
-  const { Authorization } = req.header('Authorization');
+  const  Authorization  = req.header('Authorization');
 
   if (!Authorization) {
     console.error('erro mano')
