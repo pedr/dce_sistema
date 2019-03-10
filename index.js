@@ -18,20 +18,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //ESTE TRECHO AUTORIZA REQUISICOES DE DIFERENTES END-POINTS (CROSS ORIGN REQUEST), DESTA FORMA CONSIGO CONSUMIR
 //A API NO MEU AMBIENTE DE DESENVOLVIMENTO, AO COLOCAR O APP EM PRODUÇÃO NUMA VERSÃO ESTÁVEL REMOVER TRECHO ABAIXO.
 
-app.use(function(req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+// app.use(function(req, res, next) {
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+//     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
+//     res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+//    // res.send('cors problem fixed:)');
+//  // next();
+// });
+app.get('/', (req, res) => {
+   res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
     res.setHeader('Access-Control-Allow-Credentials', true); // If needed
-   // res.send('cors problem fixed:)');
- // next();
-});
-app.get('/', (req, res) => {
   res.send('Servidor funcionando, testando deploy automaticando qnd github atualiza');
-   // res.setHeader('Access-Control-Allow-Origin', '*');
-    //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
-    //res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
-    //res.setHeader('Access-Control-Allow-Credentials', true); // If needed
 
     //res.send('cors problem fixed:)');
 });
