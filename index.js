@@ -9,11 +9,7 @@ var cors = require('cors')
 
 const app = express();
 
-//allow OPTIONS on just one resource
-app.options('http://localhost:8080', cors())
-
-//allow OPTIONS on all resources
-app.options('*', cors())
+app.use(cors())
 
 app.use(function(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
