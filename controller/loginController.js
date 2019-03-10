@@ -40,20 +40,20 @@ controller.verify = async (req, res) => {
     const gerentes = await findGerente(login);
     const gerente = gerentes[0];
     if (gerente === undefined) {
-      res.status(200).send();
+      res.status(400).send();
       return;
     }
 
     const senhaLogin = encryptarSenha(senha);
     if (gerente.senha !== senhaLogin) {
-      res.stauts(200).send();
+      res.stauts(401).send();
       return;
     }
 
     const registro = await loggingTime(gerente.gerenteid);
     if (registro === null) {
       console.error('não foi possivel salvar o log no registro');
-      res.status(200).send();
+      res.status(400).send();
       return;
     }
 
@@ -64,7 +64,7 @@ controller.verify = async (req, res) => {
     res.status(200).json({ token });
   } catch (err) {
     console.error(err);
-    res.status(400).json(err);
+    res.status(401).json(err);
   }
 };
 
