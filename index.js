@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const apiRouter = require('./routers/api.js');
 const loginRouter = require('./routers/login.js');
 const registrarRouter = require('./routers/registrar.js');
-const cors = require('cors')
 
 const app = express();
 app.use(function(req, res, next) {
@@ -24,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //ESTE TRECHO AUTORIZA REQUISICOES DE DIFERENTES END-POINTS (CROSS ORIGN REQUEST), DESTA FORMA CONSIGO CONSUMIR
 //A API NO MEU AMBIENTE DE DESENVOLVIMENTO, AO COLOCAR O APP EM PRODUÇÃO NUMA VERSÃO ESTÁVEL REMOVER TRECHO ABAIXO.
 
-app.get('/',cors(),  (req, res) => {
+app.get('/', (req, res) => {
   res.send('Servidor funcionando, testando deploy automaticando qnd github atualiza');
 });
 
