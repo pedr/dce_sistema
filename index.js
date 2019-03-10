@@ -5,8 +5,16 @@ const bodyParser = require('body-parser');
 const apiRouter = require('./routers/api.js');
 const loginRouter = require('./routers/login.js');
 const registrarRouter = require('./routers/registrar.js');
+var cors = require('cors')
 
 const app = express();
+
+//allow OPTIONS on just one resource
+app.options('/the/resource/you/request', cors())
+
+//allow OPTIONS on all resources
+app.options('*', cors())
+
 app.use(function(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
