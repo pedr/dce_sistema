@@ -8,7 +8,7 @@ controller.verifyJWT = (req, res, next) => {
   const { Authorization } = req.headers;
 
   if (!Authorization) {
-    console.error('primeiro erro', Authorization);
+    console.error('primeiro erro', req);
     return res.status(400).send('algum erro 1');
   }
 
