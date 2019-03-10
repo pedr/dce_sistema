@@ -14,10 +14,10 @@ const controller = require('../../controller/pedidosController.js');
 */
 
 router.get('/', controller.getAll);
-router.get('/notActive', controller.getAllNotActive);
-router.get('/search', controller.search);
-router.get('/:id', controller.getOne);
-router.post('/', controller.add);
-router.patch('/:id', controller.changeState);
+// router.get('/notActive', controller.getAllNotActive);
+// router.get('/search', controller.search);
+// router.get('/:id', controller.getOne);
+// router.post('/', controller.add);
+// router.patch('/:id', controller.changeState);
 
 module.exports = router;
