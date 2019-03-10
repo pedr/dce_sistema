@@ -1,4 +1,3 @@
-
 const jwt = require('jsonwebtoken');
 const db = require('../database/db.js');
 const { encryptarSenha } = require('./utils.js');
@@ -40,7 +39,7 @@ controller.verify = async (req, res) => {
     const gerentes = await findGerente(login);
     const gerente = gerentes[0];
     if (gerente === undefined) {
-      res.status(400).send();
+      res.status(401).send();
       return;
     }
 
@@ -53,7 +52,7 @@ controller.verify = async (req, res) => {
     const registro = await loggingTime(gerente.gerenteid);
     if (registro === null) {
       console.error('não foi possivel salvar o log no registro');
-      res.status(400).send();
+      res.status(401).send();
       return;
     }
 
@@ -64,7 +63,7 @@ controller.verify = async (req, res) => {
     res.status(200).json({ token });
   } catch (err) {
     console.error(err);
-    res.status(401).json(err);
+    res.status(400).json(err);
   }
 };
 
