@@ -24,7 +24,7 @@ app.use(function(req, res, next) {
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type'); // If needed
     res.setHeader('Access-Control-Allow-Credentials', true); // If needed
     res.send('cors problem fixed:)');
-  next();
+ // next();
 });
 app.get('/', (req, res) => {
   res.send('Servidor funcionando, testando deploy automaticando qnd github atualiza');
