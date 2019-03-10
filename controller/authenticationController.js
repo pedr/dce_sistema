@@ -26,8 +26,9 @@ controller.verifyJWT = (req, res, next) => {
 
   jwt.verify(token, process.env.SECRET, (err, decoded) => {
     if (err) {
-      console.error('erro 4', err);
-      return res.status(401).send('algum erro 4');
+      console.log('erro 4', err);
+      return res.status(200).send('algum erro 4');
+      //return res.status(401).send('algum erro 4');
     }
     req.userId = decoded.id;
     return next();
