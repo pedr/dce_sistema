@@ -10,7 +10,7 @@ var cors = require('cors')
 const app = express();
 
 //allow OPTIONS on just one resource
-app.options('/the/resource/you/request', cors())
+app.options('http://localhost:8080', cors())
 
 //allow OPTIONS on all resources
 app.options('*', cors())
