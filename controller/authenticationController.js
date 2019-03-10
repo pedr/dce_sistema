@@ -4,11 +4,12 @@ const jwt = require('jsonwebtoken');
 const controller = {};
 
 controller.verifyJWT = (req, res, next) => {
-  console.log(req);
+  console.log(req.headers);
   const { Authorization } = req.headers;
 
   if (!Authorization) {
-    console.error('primeiro erro',   req.header('authorization')
+    console.error('erro mano')
+    console.error('primeiro erro',   req.header('Authorization')
 );
     return res.status(400).send('algum erro 1');
   }
