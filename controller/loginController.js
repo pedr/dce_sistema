@@ -45,7 +45,7 @@ controller.verify = async (req, res) => {
 
     const senhaLogin = encryptarSenha(senha);
     if (gerente.senha !== senhaLogin) {
-      res.stauts(401).send();
+      res.status(401).send();
       return;
     }
 
